@@ -1,60 +1,35 @@
 import React from 'react';
 import SideMenu from '../../components/sideMenu/sideMenu';
 import NavigationBar from '../../components/NavigationBar';
-import Rectangle from '../../assets/Rectangle 117.png'
-import blueCircle from '../../assets/Circulo azul.svg';
 import './indicadores.css';
 import useGestorData from '../../components/useGestorData/userGestorData';
-
+import useAssignData from '../../components/indicadorMesAtual/useAssignData';
+import TabelaIndicadores from '../../components/indicadorMesAtual';
+import ColabPIndic from '../../components/ColaboradorPorIndicador/ColabPIndic';
+import MedGeral from '../../components/medGeral/MedGeral';
 
 const Indicadores: React.FC = () => {
   
     const data = useGestorData();
-
+    const indicadores = useAssignData();
     return (
         <div className="grid grid-cols-[min-content,1fr] h-screen">
             <SideMenu gestorId={data.id}/>
-            <main className="flex-grow bg-gray-50">
+            <main className="flex-grow bg-gray-50 ">
                 <div className="flex items-center">
                     <NavigationBar name={data.name} picture={data.imgUrl}/>
-                </div>
-                    <div className="div-pai">
-                    <div className="botoesIndicadores">
-                        <div className="botaoIndicadores flex items-center">
-                            <div className="image-content w-1/2 flex justify-center items-center pt-40px">
-                            <img src={blueCircle} alt="Descrição da segunda imagem" />
-                        </div>
-                        <div className="text-content flex flex-col justify-center items-start w-1/2">
-                            <h1>Atenção!</h1>
-                            <h2>Sua equipe está abaixo da média este mês, clique aqui para saber mais</h2>
-                        </div>
-                        </div>
-                        <div className="botaoE flex items-center">
-                            <div className="image-content w-1/2 flex justify-center items-center pt-40px">
-                            <img src={blueCircle} alt="Descrição da segunda imagem" />
-                        </div>
-                        <div className="text-content flex flex-col justify-center items-start w-1/2">
-                            <h1>Atenção!</h1>
-                            <h2>Sua equipe está abaixo da média este mês, clique aqui para saber mais</h2>
-                        </div>
-                        </div>
-                    </div>
-                        <div className="grafico">
-                        <img src={Rectangle} alt="Descrição da imagem" />
-                        </div>
-                    </div>
-                    <div className="div-pai">
-                        <div className="grafico">
-                        <img src={Rectangle} alt="Descrição da imagem" />
-                        </div>
-                        <div className="grafico">
-                        <img src={Rectangle} alt="Descrição da imagem" />
-                        </div>
-                    </div>
-        
-        
-                
-               
+                </div>  
+                <section className= 'flex p-30'>
+                    <ColabPIndic></ColabPIndic>
+                    <section className='m-10'>
+                        <section className='border border-gray-400 rounded-lg p-8'> 
+                            <MedGeral></MedGeral>
+                        </section>
+                        <TabelaIndicadores></TabelaIndicadores>
+                       
+                    </section>
+                    
+               </section>
             </main>
         </div>
     );
