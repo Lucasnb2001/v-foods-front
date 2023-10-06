@@ -1,6 +1,7 @@
-export default interface Indicador{
-    id_indicator: number;
-    id_gestor: string; 
-    name: string;
-    Description: string;
-  }
+export default interface Indicador {
+    id: number,
+    managerId: number,
+    name: string,
+    description: string,
+    measurement: string,
+}

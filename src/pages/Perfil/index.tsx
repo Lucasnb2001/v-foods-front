@@ -1,96 +1,186 @@
 import styles from './index.module.css';
-import UserInfo from '../../components/UserInfo';
 import SideMenu from '../../components/sideMenu/sideMenu';
 import NavigationBar from '../../components/NavigationBar';
-import useGestorData from '../../components/useGestorData/userGestorData';
+import search from '../../../public/search.svg';
+import profile from '../../../public/profile.svg';
+import GestorInfo from '../../components/GestorInfo';
 import { Link } from 'react-router-dom';
+import Colaborador from '../../Interfaces/Colaborador';
+//import Indicador from '../../Interfaces/Indicador';
+import IndicatorData from '../../Interfaces/indiData';
+import { useEffect, useState } from 'react';
+import Graph from "../../components/Graph";
+import api from '../../api';
 
 export const PerfilGestor = () => {
 
-    const data = useGestorData();
+    const data = JSON.parse(localStorage['user']);
+    const [colabData, setcolabData] = useState<Colaborador[]>([{ name: '', email: '', imgUrl: '', id: 0, managerId: 0, cellphone: '', dateBirth: '', address: '' }]);
+    const [assignData, setAssignData] = useState<IndicatorData[]>([{ 
+      colaboratorId: 0,
+      indicatorId: 0,
+      month: 0,
+      year: 0,
+      weight: 0,
+      meta: 0,
+      superMeta: 0,
+      challenge: 0,
+      result: 0,
+      resultDate: ''
+    
+    }]);
+    //const task: Indicador[] = [{ id: 0, managerId: 0, name: '', description: ''}];
+
+    
+    useEffect(() => {
+        //Get All Assigns from Manager
+        api
+          .get(`/colaborator/all/${data.id}`)
+          .then((response) => {
+            setcolabData(response.data);
+            //console.log(colabData);
+          })
+          .catch(() => {
+            //console.error("Error:", error);
+          });
+
+        api
+          .get(`/assign/all/manager/${data.id}`)
+          .then((response) => {
+            setAssignData(response.data);
+          })
+          .catch(() => {
+            //console.error("Error:", error);
+          });
+        
+        
+
+        
+    }, [assignData, colabData, data.id]);
+
+    function calculateMetaValues(filteredAssignData: IndicatorData[]) {
+        // Calculo da meta total alcançada
+        let metaAchive = 0;
+        filteredAssignData.forEach(item => {
+          metaAchive += item.result;
+        });
+      
+        // Calculo da meta total a ser alcançada pelo time
+        let metaToAchive = 0;
+        filteredAssignData.forEach(item => {
+          metaToAchive += item.meta;
+        });
+      
+        return {
+          metaAchive,
+          metaToAchive
+        };
+      }
+      
+        // Para usar a função e obter os valores calculados
+        const { metaAchive, metaToAchive } = calculateMetaValues(assignData);
+        const filteredAssignDat0 = assignData.filter(item => item.colaboratorId === colabData[0]?.id);
+        const filteredAssignData1 = assignData.filter(item => item.colaboratorId === colabData[1]?.id);
+        const metaValues: { metaAchive: number, metaToAchive: number }[] = [];
+
+        metaValues[0] = calculateMetaValues(filteredAssignDat0);
+        metaValues[1] = calculateMetaValues(filteredAssignData1);
+
+    
+
+
     return (
         <div className='bg-gray-50 h-screen flex '>
-            <SideMenu gestorId={data.id}></SideMenu>
+            <SideMenu></SideMenu>
             <div>
                 <NavigationBar name={data.name} picture={data.imgUrl}></NavigationBar>
-            <div className='flex pt-[50px]'>
+            <div className='flex'>
                 <div id='esquerda'>
-                    <UserInfo picture={data.imgUrl} name={data.name} cargo='' email={data.email}/>
+                    <GestorInfo picture={data.imgUrl} name={data.name} cargo='' email={data.email} socials='linkedin.com/in/josé-sanches'/>
                     <div className={styles['metas']}>
-                        <div className='flex w-full  mt-5'>
-                            <h1 className=' text-lg font-bold mt-4'>Time X</h1>
+                        <div className='flex w-full'>
+                            <h1 className=' text-lg font-bold'>Time X</h1>
                             <p className=' ml-auto text-sm  text-red-600 font-semibold'>ver todos os colaboradores  </p>
                         </div>
                         
-                        <p className='text-gray-500 text-sm'>Acompanhe o desenvolvimento dos indicadores criados este mês</p>
-                        <div className='flex'>
-                            <img className=' rounded-full w-11 h-11 mt-8 -mr-2' src='https://m.media-amazon.com/images/M/MV5BYWUzNzA4YWUtYWViYy00Zjg1LWE4ODEtZDYwOTAzMTg3YTZhXkEyXkFqcGdeQXVyNjg0NjE4OTM@._V1_QL75_UX140_CR0,12,140,140_.jpg'></img>
-                            <img className=' rounded-full w-11 h-11 mt-8 -mr-2' src='https://a.wattpad.com/useravatar/Hakkaiproperty.256.605649.jpg'></img>
-                            <img className=' rounded-full w-11 h-11 mt-8 -mr-2' src='https://profile-images.xing.com/images/559ea8811fd76869d487e305883cb8a0-1/marine-messager.256x256.jpg'></img>
+                        <p className='text-gray-500 text-sm'>Acompanhe o desenvolvimento dos indicadores criados este mês </p>
+                        <div className='flex mt-4'>
+                            <img className=' rounded-full w-10 h-10 -mr-2' src={colabData[0]?.imgUrl}></img>
+                            <img className=' rounded-full w-10 h-10 -mr-2' src={colabData[1]?.imgUrl}></img>
+                            <img className=' rounded-full w-10 h-10 -mr-2' src={colabData[2]?.imgUrl}></img>
 
                         
                         </div>
                         <div className='flex w-full  mt-2 mb-2'>
                             <h1 className='font-semibold text-sm'>Andamento Geral</h1>
-                            <p className='ml-auto text-sm'>80%</p>
+                            <p className='ml-auto text-sm'>{Math.round(metaAchive/metaToAchive*100)}%</p>
                             
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-1.5 mb-4 dark:bg-gray-200">
-                            <div className="bg-red-600 h-1.5 rounded-full dark:bg-red-600" style={{ width: '80%' }}></div>
+                            <div className="bg-red-600 h-1.5 rounded-full dark:bg-red-600" style={{ width: `${metaAchive/metaToAchive*100}%` }}></div>
                         </div>
+                    </div>
+                    <div className={styles['calendar']}>
+                        <Graph indicatorData={assignData}></Graph>
+                    
                     </div>
                 </div>
                 <div id='direita'>
-                    <div className='flex'>
-                        <div className=' h-[148px] w-[228px] rounded-[14px] bg-black ml-16 p-4 flex justify-start'>
-                            <div className=' text-white text-8xl font-bold z-10'>
-                                <p className='mr-4'>+</p>
-                            </div>
-                            <div className='text-white  mt-11 font-semibold'>
-                                <p>Criar indicador</p>
-                            </div>
-
-                        </div>
-                        <Link to={`/addColaborador?id=${data.id}`}>
-                        <div className='h-[148px] w-[228px] rounded-[14px] bg-[#E51110] ml-4 flex px-6 pt-10'>
-                            <img src={'https://icon-library.com/images/profile-icon-white/profile-icon-white-1.jpg'} className=' w-32 h-16 mr-4'></img>
-                            <div className=' text-white font-semibold mt-2'>
-                                <p>Adicionar colaborador</p>
-                            </div>
-                        </div>
-                        </Link>
-                    </div>
                     <div className={styles['status']}>
                         <div className='flex  mt-5'>
-                            <h1 className=' text-lg font-bold'>Status de metas</h1>
-                            <p className='text-gray-500 text-right text-sm ml-auto border px-8 py-1'>Editar</p>
+                            <h1 className=' text-lg font-bold'>Status por colaborador </h1>
+                            <p className='text-gray-500 text-right text-sm ml-auto'>
+                            <img src={search}></img>
+                            </p>
                         </div>
-                        <p className='text-gray-500 text-sm'>Status de diferentes indicadores e de Todos os colaboradores</p>
-                        <div className=' flex mt-8 justify-start'>
-                            <div>
-                                GRÁFICO PIZZA
-                            </div>
-                            <div className=' ml-4'>
-                                <div className='flex align-middle  mb-4'>
-                                    <div className='bg-[#E51110] p-1 text-white rounded-md'>80%</div>
-                                    <div className='ml-4 text-lg font-semibold text-[#E51110]'>meta</div>
+                        <p className='text-gray-500 text-sm border-b border-gray-300 pb-4 w-full'>Acompanhe o desenvolvimento por perfil</p>
+                        <div className='flex text-gray-500 text-sm border-b border-gray-300 py-4 w-full'>
+                            <p className=' mr-auto'>Metas</p>
+                            <p className=' ml-auto'>Colaborador</p>
+                        </div>
+
+                        <div className='flex pt-4 w-full'>
+                            <div className=' mr-auto w-1/2'>
+                                <div className='flex w-full  mt-2 mb-2'>
+                                    <h1 className='font-semibold text-sm'>{colabData[0]?.name}</h1>
                                 </div>
-                                <div className='flex align-middle  mb-4'>
-                                    <div className='bg-[#626FD9] p-1 text-white rounded-md'>15%</div>
-                                    <div className='ml-4 text-lg font-semibold text-[#626FD9]'>supermeta</div>
-                                </div>
-                                <div className='flex align-middle  mb-4'>
-                                    <div className='bg-[#169aab] p-1 text-white rounded-md text-justify'>05%</div>
-                                    <div className='ml-4 text-lg font-semibold text-[#169aab]'>desafio</div>
+                                <div className="w-full bg-gray-200 rounded-full h-1.5 mb-4 dark:bg-gray-200">
+                                    <div className="bg-red-600 h-1.5 rounded-full dark:bg-red-600" style={{ width: `${metaValues[0].metaAchive/metaValues[0].metaToAchive*100}%` }}></div>
                                 </div>
                             </div>
+                            <div className=' ml-auto'>
+                                <img className=' rounded-full w-11 h-11 mt-2 mr-4' src={colabData[0]?.imgUrl}></img>
+                            </div>
                         </div>
+                        <div className='flex pt-4 w-full'>
+                            <div className=' mr-auto w-1/2'>
+                                <div className='w-full  mt-2 mb-2'>
+                                    <h1 className='font-semibold text-sm'>{colabData[1]?.name}</h1>
+                                </div>
+                                <div className="w-full bg-gray-200 rounded-full h-1.5 mb-4 dark:bg-gray-200">
+                                    <div className="bg-[#626FD9] h-1.5 rounded-full dark:bg-[#169aab]" style={{ width: `${metaValues[1].metaAchive/metaValues[1].metaToAchive*100}%` }}></div>
+                                </div>
+                            </div>
+                            <div className=' ml-auto'>
+                                <img className=' rounded-full w-11 h-11 mt-2 mr-4' src={colabData[1]?.imgUrl}></img>
+                            </div>
+                        </div>
+                        
                     </div>
-                    <footer className=' text-right  mt-8 flex'>
-                        <div className=' py-2 px-4 border-2 ml-auto rounded-md border-[#d6d6d6]'>Setembro</div> 
-                        <div className='p-2 bg-black text-white rounded-md ml-4'>Baixar PDF</div>
-                    </footer>
+                    <div className={styles['addColab']}>
+                        <div className='flex p-6'>
+                            <img src={profile} className=' ml-auto mr-4'></img>
+                            <Link to={`/AddColaborador?id=${data.id}`}>
+                            <div className='my-auto mr-auto '>
+                                <p className='font-bold text-xl'>Adicionar perfil</p>                           
+                                <p className='text-gray-500 text-sm'>Adicione um novo colaborador a sua equipe!</p>
+                            </div>
+                            </Link>
+                        </div>
+
+                    </div>
                 </div>
+                
             </div>
             </div>
         </div>
