@@ -75,7 +75,7 @@ const Colaborador = () => {
     return (
         <div className='bg-gray-50 h-screen flex  pr-36'>
             <SideMenu></SideMenu>
-            <div>
+            <div className=" w-full">
                 <NavigationBar name={data.name} picture={data.imgUrl}></NavigationBar>
                 <div className='flex pt-[50px]'>
                     

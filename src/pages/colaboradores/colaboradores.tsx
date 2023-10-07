@@ -86,7 +86,7 @@ const Colaboradores: React.FC = () => {
             <div className="colab-tabela-pai">
            
                 <div className="colab-tabela-top">
-                    <div className="colab-time">Time X</div>
+                    <div className="colab-time">Time {data.area}</div>
                     <button className="criar-indicador-btn">
                         Criar Indicador
                     </button>

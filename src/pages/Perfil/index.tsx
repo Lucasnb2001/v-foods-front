@@ -92,9 +92,9 @@ export const PerfilGestor = () => {
     return (
         <div className='bg-gray-50 h-screen flex '>
             <SideMenu></SideMenu>
-            <div>
+            <div className=' w-full'>
                 <NavigationBar name={data.name} picture={data.imgUrl}></NavigationBar>
-            <div className='flex'>
+            <div className='flex w-full'>
                 <div id='esquerda'>
                     <GestorInfo picture={data.imgUrl} name={data.name} cargo={data.area} email={data.email} socials='linkedin.com/in/josé-sanches'/>
                     <div className={styles['metas']}>

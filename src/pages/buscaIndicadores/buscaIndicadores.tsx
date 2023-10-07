@@ -125,7 +125,7 @@ const BuscaIndicadores: React.FC = () => {
         <div className="grid grid-cols-[min-content,1fr] h-screen">
             <SideMenu />
             <main className="flex-grow" style={{ backgroundColor: '#FBFBFB' }}>
-                <NavigationBar picture={''} name={''} />
+                <NavigationBar picture={data.imgUrl} name={data.name} />
                 <div className="search-tabela-pai">
                     <div className="search-tabela-top">
                         <button 
